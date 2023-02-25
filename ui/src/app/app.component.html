@@ -1,0 +1,15 @@
+<div class="h-screen flex flex-col">
+  <header class="bg-gray-600 text-white">
+    <nav class="h-full max-w-5xl mx-auto p-2 flex gap-4">
+      <button class="my-auto flex gap-2 text-3xl font-bold font-heading" (click)="navigate('/')">
+        <img class="h-9" src="/assets/logo-white.svg" alt="logo">
+        News
+      </button>
+    </nav>
+  </header>
+  <div class="flex-auto p-2">
+    <div class="max-w-5xl mx-auto h-full">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
