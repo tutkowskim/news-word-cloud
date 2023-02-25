@@ -1,8 +1,8 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
 import * as cloud from 'd3-cloud';
 import randomColor from 'randomcolor';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { WordCount } from '../news.service';
 
 @Component({
@@ -11,8 +11,8 @@ import { WordCount } from '../news.service';
   styleUrls: ['./word-map.component.css']
 })
 export class WordMapComponent implements AfterViewInit {
-  @ViewChild('wordCloud') 
-  public wordCloudRef: ElementRef|null = null;
+  @ViewChild('wordCloud')
+  public wordCloudRef: ElementRef | null = null;
 
   @Input()
   public set words(value: WordCount[]) {
@@ -26,6 +26,9 @@ export class WordMapComponent implements AfterViewInit {
   public ngAfterViewInit(): void {
     this._words.subscribe(() => this.redrawWordCloud());
   }
+
+  @Output()
+  public readonly selectedWord = new EventEmitter<string>();
 
   @HostListener('window:resize', ['$event'])
   public onResize(): void {
@@ -43,8 +46,8 @@ export class WordMapComponent implements AfterViewInit {
     const wordCloudDiv = d3
       .select("#word-cloud");
     wordCloudDiv
-        .select('svg')
-        .remove();
+      .select('svg')
+      .remove();
 
     const svg = wordCloudDiv
       .append("svg")
@@ -61,12 +64,18 @@ export class WordMapComponent implements AfterViewInit {
       .font(fontFamily)
       .fontSize((d: any) => Math.sqrt(d.value) * fontScale)
       .on("word", ({ size, x, y, rotate, text }) => {
-        svg
+        const textElement = svg
           .append("text")
           .attr("font-size", size || 12)
           .attr("transform", `translate(${x},${y}) rotate(${rotate})`)
           .attr("fill", randomColor())
+          .attr("cursor", "pointer")
           .text(text || '');
+
+        textElement
+          .on('mouseover', function () { d3.select(this).attr('text-decoration', 'underline') })
+          .on('mouseout', function () { d3.select(this).attr('text-decoration', 'inherit') })
+          .on('click', () => { if (text) this.selectedWord.next(text) });
       });
 
     w_cloud.start();

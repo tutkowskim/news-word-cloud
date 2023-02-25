@@ -1,7 +1,8 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import skipWords from './skipWords.json';
-import { Article, WordCount } from "./types";
 import axios from "axios";
+import { Article, WordCount } from "./types";
+import skipWords from './skipWords.json';
+import mockData from './mockData.json';
 
 const buildNewsApi = (apiKey: string, term: string, from: string) => `https://newsapi.org/v2/everything?from=${from}&sortBy=popularity&apiKey=${apiKey}&q=${encodeURIComponent(term)}`;
 
@@ -40,8 +41,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     const searchTerm = req.query.term;
 
     try {
-        const res = await axios.get(buildNewsApi(apiKey, searchTerm, dateString));
-        const articles: Article[] = res.data.articles;
+        const apiResult = (process.env.USE_MOCK_DATA !== 'true') 
+            ? (await axios.get(buildNewsApi(apiKey, searchTerm, dateString))).data
+            : mockData;
+        const articles: Article[] = apiResult.articles;
 
         const wordCounts = countWordsInArticles(articles);
         const result = {

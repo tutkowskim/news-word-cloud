@@ -7,16 +7,18 @@
       </button>
     </nav>
   </header>
-  <div class="flex-auto p-4">
+  <div class="flex-auto p-4" relative>
+    <!-- Search -->
     <div class="flex flex-col align-items-center max-w-5xl mx-auto h-full">
       <div class="mb-6">
-        <input type="text" placeholder="Search" [(ngModel)]="term" class="block w-full max-w-sm mx-auto p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <input type="text" placeholder="Search" [(ngModel)]="term"
+          class="block w-full max-w-sm mx-auto p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div *ngIf="!term " class="text-center">
         Enter a search term to find news articles and build a word cloud.
       </div>
       <div *ngIf="term && news && !isLoading && !unableToLoadNews" class="flex-auto">
-        <app-word-map [words]=news.wordCounts></app-word-map>
+        <app-word-map [words]=news.wordCounts (selectedWord)="updatedSelectedWord($event)"></app-word-map>
       </div>
       <div *ngIf="term && isLoading" class="flex justify-center">
         <app-spinner></app-spinner>
@@ -24,5 +26,27 @@
       <div *ngIf="term && !isLoading && unableToLoadNews" class="flex justify-center">
         Unable to load news. Please try again later.
       </div>
+    </div>
+
+    <!-- Selected word Dialog -->
+    <div *ngIf="selectedWord" class="z-10">
+      <!-- Overlay Effect -->
+      <div class="absolute bottom-0 left-0 right-0 top-0 bg-gray-50 opacity-80"></div>
+      <!-- Dialog -->
+      <div class="absolute bottom-0 left-0 right-0 top-0">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-5xl shadow-lg rounded-md bg-white">
+          <div class="m-3">
+            <div class="flex pb-2">
+              <div class="text-4xl font-bold">{{selectedWord}}</div>
+              <div class="flex-auto"></div>
+              <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" (click)="clearSelectedWord()">Close</button>
+            </div>
+            <div *ngFor="let article of articlesForSelectedWord()" class="w-full font-medium text-blue-600 dark:text-blue-500 hover:underline whitespace-nowrap text-ellipsis overflow-hidden">
+              <a class="" [href]="article.url">{{ article.title}}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
