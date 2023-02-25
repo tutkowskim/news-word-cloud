@@ -35,7 +35,7 @@ export class WordMapComponent implements AfterViewInit {
     this.redrawWordCloud();
   }
 
-  private redrawWordCloud(): void {
+  private async redrawWordCloud(): Promise<void> {
     const height = this.wordCloudRef?.nativeElement?.offsetHeight;
     const width = this.wordCloudRef?.nativeElement?.offsetWidth;
     const fontFamily = "sans-serif";
