@@ -34,7 +34,7 @@ const countWordsInArticles = (articles: Article[]): WordCount[] => {
 }
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    const daysToInclude = 14;
+    const daysToInclude = 7;
     const fromDate: Date = new Date(new Date().getTime()-(daysToInclude*24*60*60*1000));
     const dateString = fromDate.toISOString().slice(0, 10);
     const apiKey: string = process.env.NEWS_API_KEY || '';
