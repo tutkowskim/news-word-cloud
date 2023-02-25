@@ -1,7 +1,9 @@
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
 import * as cloud from 'd3-cloud';
 import randomColor from 'randomcolor';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { WordCount } from '../news.service';
 
 @Component({
   selector: 'app-word-map',
@@ -12,15 +14,17 @@ export class WordMapComponent implements AfterViewInit {
   @ViewChild('wordCloud') 
   public wordCloudRef: ElementRef|null = null;
 
-  public readonly  data: {word: string, count: number}[] = [
-    { word: 'Hi', count: 2*10 }, 
-    { word: 'There', count: 5*10 },
-    { word: 'My', count: 10*10 },
-    { word: 'Friend', count: 3*10 },
-  ]
+  @Input()
+  public set words(value: WordCount[]) {
+    this._words.next(value);
+  }
+  public get words(): WordCount[] {
+    return this._words.value;
+  }
+  private _words: BehaviorSubject<WordCount[]> = new BehaviorSubject<WordCount[]>([]);
 
   public ngAfterViewInit(): void {
-    this.redrawWordCloud();
+    this._words.subscribe(() => this.redrawWordCloud());
   }
 
   @HostListener('window:resize', ['$event'])
@@ -51,7 +55,7 @@ export class WordMapComponent implements AfterViewInit {
 
     const w_cloud = cloud()
       .size([width, height])
-      .words(this.data.map((d) => Object.create({ text: d.word, value: d.count })))
+      .words(this.words.map((d) => Object.create({ text: d.word, value: d.count })))
       .padding(padding)
       .rotate(rotate)
       .font(fontFamily)
