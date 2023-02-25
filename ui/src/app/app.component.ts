@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { BehaviorSubject, debounceTime, firstValueFrom, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, debounceTime, firstValueFrom } from 'rxjs';
 import { News, NewsService } from './news.service';
 
 @Component({
@@ -24,6 +23,7 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     this._term.pipe(debounceTime(750)).subscribe(term => {
+      this.news = null;
       firstValueFrom(this.newsService.getNews(term)).then(news => this.news = news);
     });
   }
