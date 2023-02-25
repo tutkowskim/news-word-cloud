@@ -8,10 +8,12 @@ import { News, NewsService } from './news.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  public news: News|null = null;
-  private _term: BehaviorSubject<string> = new BehaviorSubject<string>('tech');
-  
-  public get term(): string{
+  public news: News | null = null;
+  public isLoading: boolean = false;
+  public unableToLoadNews: boolean = false;
+  private _term: BehaviorSubject<string> = new BehaviorSubject<string>('');
+
+  public get term(): string {
     return this._term.value;
   }
 
@@ -19,12 +21,24 @@ export class AppComponent implements OnInit {
     this._term.next(value);
   }
 
-  constructor(private newsService: NewsService) {}
+  constructor(private newsService: NewsService) { }
 
   public ngOnInit(): void {
     this._term.pipe(debounceTime(750)).subscribe(term => {
       this.news = null;
-      firstValueFrom(this.newsService.getNews(term)).then(news => this.news = news);
+      this.unableToLoadNews = false;
+
+      if (term) {
+        this.isLoading = true;
+        firstValueFrom(this.newsService.getNews(term)).then((news: any) => {
+          if (news['articles'] && news['wordCounts']) {
+            this.news = news as News;
+          } else {
+            this.unableToLoadNews = true;
+          }
+          this.isLoading = false;
+        });
+      }
     });
   }
 }

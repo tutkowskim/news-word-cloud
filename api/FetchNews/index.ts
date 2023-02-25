@@ -39,23 +39,31 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     const apiKey: string = process.env.NEWS_API_KEY || '';
     const searchTerm = req.query.term;
 
-    const res = await axios.get(buildNewsApi(apiKey, searchTerm, dateString));
-    const articles: Article[] = res.data.articles;
+    try {
+        const res = await axios.get(buildNewsApi(apiKey, searchTerm, dateString));
+        const articles: Article[] = res.data.articles;
 
-    const wordCounts = countWordsInArticles(articles);
-    const result = {
-        articles: articles.map(article => ({ 
-            url: article.url,
-            urlToImage: article.urlToImage,
-            title: article.title,
-            description: article.description,
-            publishedAt: article.publishedAt,
-        })),
-        wordCounts,
-    };
-    context.res = {
-        body: JSON.stringify(result),
-    };
+        const wordCounts = countWordsInArticles(articles);
+        const result = {
+            articles: articles.map(article => ({ 
+                url: article.url,
+                urlToImage: article.urlToImage,
+                title: article.title,
+                description: article.description,
+                publishedAt: article.publishedAt,
+            })),
+            wordCounts,
+        };
+        
+        context.res = {
+            body: JSON.stringify(result),
+        };
+    } catch (err) {
+        context.res = {
+            statsCode: 400,
+            body: JSON.stringify({ error: err }),
+        };
+    }
 };
 
 export default httpTrigger;

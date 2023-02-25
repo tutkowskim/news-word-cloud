@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable } from 'rxjs';
 
 export interface Article {
   title: string;
@@ -16,10 +16,13 @@ export interface WordCount {
   articles: number[];
 }
 
-
 export interface News {
   articles: Article[];
   wordCounts: WordCount[];
+}
+
+export interface Error {
+  error?: any;
 }
 
 @Injectable({
@@ -28,7 +31,7 @@ export interface News {
 export class NewsService {
   constructor(private http: HttpClient) { }
 
-  public getNews(term: string): Observable<News> {
+  public getNews(term: string): Observable<News|Error> {
     return this.http.get<News>(`/api/FetchNews?term=${encodeURIComponent(term)}`);
   }
 }
