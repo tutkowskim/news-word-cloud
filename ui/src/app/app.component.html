@@ -42,7 +42,7 @@
               <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" (click)="clearSelectedWord()">Close</button>
             </div>
             <div *ngFor="let article of articlesForSelectedWord()" class="w-full font-medium text-blue-600 dark:text-blue-500 hover:underline whitespace-nowrap text-ellipsis overflow-hidden">
-              <a class="" [href]="article.url">{{ article.title}}</a>
+              <a class="" [href]="article.url" target="_blank">{{ article.title}}</a>
             </div>
           </div>
         </div>
